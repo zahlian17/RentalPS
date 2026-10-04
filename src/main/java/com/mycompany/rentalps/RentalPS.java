@@ -1,131 +1,154 @@
-package com.mycompany.rentalps;
+package com.mycompany.rentalps;1
 import java.util.Scanner;
 
 public class RentalPS {
+    private static final int KAPASITAS = 100;
+    private static final Scanner input = new Scanner(System.in);
+    private static final RentalPSBase[] daftarRental = new RentalPSBase[KAPASITAS];
+    private static int jumlahData = 0;
+    private static int idBerikutnya = 4;
 
     public static void main(String[] args) {
+        isiDataAwal();
+        int pilihan;
+        do {
+            tampilkanMenu();
+            pilihan = bacaInteger("Pilih menu: ");
+            switch (pilihan) {
+                case 1: tambahData(); break;
+                case 2: tampilkanSemuaData(); break;
+                case 3: menuPencarian(); break;
+                case 4:
+                    System.out.println("Total objek berhasil dibuat: " + RentalPSBase.getTotalObjek());
+                    System.out.println("Terima kasih telah menggunakan RentalPS.");
+                    break;
+                default: System.out.println("Pilihan tidak tersedia. Masukkan angka 1-4.");
+            }
+        } while (pilihan != 4);
+        input.close();
+    }
 
-        Scanner scanner = new Scanner(System.in);
+    private static void isiDataAwal() {
+        daftarRental[jumlahData++] = new RentalPS3(1, "Andi", 2, 2);
+        daftarRental[jumlahData++] = new RentalPS4(2, "Budi", 3, "FIFA");
+        daftarRental[jumlahData++] = new RentalPS3(3, "Citra", 1, 1);
+    }
 
-        // Array untuk menyimpan nama pelanggan
-        String[] namaPelanggan = new String[10];
-
-        // Array untuk menyimpan jenis PS
-        String[] jenisPS = new String[10];
-
-        // Array untuk menyimpan lama rental
-        int[] lamaRental = new int[10];
-
-        // Variabel untuk menghitung jumlah data rental
-        int jumlahRental = 0;
-
-        // Penanda apakah program masih berjalan
-        boolean isRunning = true;
-
-        System.out.println("==================================");
+    private static void tampilkanMenu() {
+        System.out.println("\\n==================================");
         System.out.println("       RENTAL PLAYSTATION");
         System.out.println("==================================");
+        System.out.println("1. Tambah Data Rental");
+        System.out.println("2. Tampilkan Seluruh Data");
+        System.out.println("3. Pencarian Data");
+        System.out.println("4. Keluar");
+        System.out.println("----------------------------------");
+    }
 
-        while (isRunning) {
-
-            System.out.println("\nMenu Rental PS:");
-            System.out.println("1. Tambah Data Rental");
-            System.out.println("2. Lihat Data Rental");
-            System.out.println("3. Keluar");
-            System.out.println("==================================");
-            System.out.print("Pilih menu: ");
-
-            int pilihan = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (pilihan) {
-
-                case 1:
-
-                    if (jumlahRental < namaPelanggan.length) {
-
-                        System.out.println("\n--- Tambah Data Rental ---");
-
-                        System.out.print("Nama Pelanggan : ");
-                        namaPelanggan[jumlahRental] = scanner.nextLine();
-
-                        System.out.print("Jenis PS (PS3/PS4/PS5) : ");
-                        jenisPS[jumlahRental] = scanner.nextLine();
-
-                        System.out.print("Lama Rental (jam) : ");
-                        lamaRental[jumlahRental] = scanner.nextInt();
-                        scanner.nextLine();
-
-                        jumlahRental++;
-
-                        System.out.println("Data rental berhasil ditambahkan!");
-
-                    } else {
-
-                        System.out.println("Data rental sudah penuh!");
-
-                    }
-
-                    break;
-
-                case 2:
-
-                    System.out.println("\n--- Daftar Rental PS ---");
-
-                    if (jumlahRental == 0) {
-
-                        System.out.println("Belum ada data rental.");
-
-                    } else {
-
-                        for (int i = 0; i < jumlahRental; i++) {
-
-                            System.out.println("\nData Rental ke-" + (i + 1));
-                            System.out.println("Nama Pelanggan : "
-                                    + namaPelanggan[i]);
-                            System.out.println("Jenis PS       : "
-                                    + jenisPS[i]);
-                            System.out.println("Lama Rental    : "
-                                    + lamaRental[i] + " jam");
-
-                            int hargaPerJam;
-
-                            if (jenisPS[i].equalsIgnoreCase("PS3")) {
-                                hargaPerJam = 5000;
-                            } else if (jenisPS[i].equalsIgnoreCase("PS4")) {
-                                hargaPerJam = 8000;
-                            } else if (jenisPS[i].equalsIgnoreCase("PS5")) {
-                                hargaPerJam = 10000;
-                            } else {
-                                hargaPerJam = 0;
-                            }
-
-                            int totalBiaya = hargaPerJam * lamaRental[i];
-
-                            System.out.println("Harga Per Jam  : Rp " + hargaPerJam);
-                            System.out.println("Total Biaya    : Rp " + totalBiaya);
-                        }
-                    }
-
-                    break;
-
-                case 3:
-
-                    isRunning = false;
-
-                    System.out.println("\nTerima kasih telah menggunakan");
-                    System.out.println("sistem Rental PlayStation!");
-
-                    break;
-
-                default:
-
-                    System.out.println("\nPilihan menu tidak tersedia!");
-
-                    break;
-            }
+    private static void tambahData() {
+        if (jumlahData >= daftarRental.length) {
+            System.out.println("Penyimpanan data penuh.");
+            return;
+        }
+        System.out.println("\\n--- Tambah Data Rental ---");
+        System.out.println("1. PS3 (Rp5.000/jam)");
+        System.out.println("2. PS4 (Rp10.000/jam)");
+        int tipe = bacaInteger("Pilih tipe PS: ");
+        if (tipe != 1 && tipe != 2) {
+            System.out.println("Tipe PS tidak valid.");
+            return;
         }
 
-        scanner.close();
+        System.out.print("Nama penyewa: ");
+        String nama = input.nextLine().trim();
+        int durasi = bacaInteger("Durasi sewa (jam): ");
+
+        try {
+            RentalPSBase dataBaru;
+            switch (tipe) {
+                case 1:
+                    int stik = bacaInteger("Jumlah stik (1-4): ");
+                    dataBaru = new RentalPS3(idBerikutnya, nama, durasi, stik);
+                    break;
+                case 2:
+                    System.out.print("Game favorit: ");
+                    String game = input.nextLine().trim();
+                    dataBaru = new RentalPS4(idBerikutnya, nama, durasi, game);
+                    break;
+                default: return;
+            }
+            daftarRental[jumlahData++] = dataBaru;
+            idBerikutnya++;
+            System.out.println("Data berhasil ditambahkan.");
+            System.out.printf("Total biaya: Rp%.0f%n", dataBaru.hitungTotal());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Gagal menambahkan data: " + e.getMessage());
+        }
+    }
+
+    private static void tampilkanSemuaData() {
+        System.out.println("\\n====================== DAFTAR RENTAL ======================");
+        System.out.printf("| %-4s | %-18s | %-8s | %-5s | %-11s | %-11s |%n",
+                "ID", "Penyewa/Info", "Jenis", "Jam", "Harga/Jam", "Total");
+        System.out.println("-----------------------------------------------------------");
+        if (jumlahData == 0) {
+            System.out.println("Belum ada data rental.");
+            return;
+        }
+        for (int i = 0; i < jumlahData; i++) {
+            daftarRental[i].tampilkanDetail(); // dynamic binding / overriding
+        }
+        System.out.println("-----------------------------------------------------------");
+        System.out.println("Jumlah data: " + jumlahData);
+    }
+
+    // Overloading: pencarian berdasarkan ID.
+    private static RentalPSBase cariRental(int id) {
+        for (int i = 0; i < jumlahData; i++)
+            if (daftarRental[i].getIdRental() == id) return daftarRental[i];
+        return null;
+    }
+
+    // Overloading: pencarian berdasarkan nama.
+    private static RentalPSBase cariRental(String nama) {
+        for (int i = 0; i < jumlahData; i++)
+            if (daftarRental[i].getNamaPenyewa().equalsIgnoreCase(nama.trim())) return daftarRental[i];
+        return null;
+    }
+
+    private static void menuPencarian() {
+        System.out.println("\\n--- Pencarian Data ---");
+        System.out.println("1. Cari berdasarkan ID");
+        System.out.println("2. Cari berdasarkan nama");
+        int pilihan = bacaInteger("Pilih cara pencarian: ");
+        RentalPSBase hasil;
+        switch (pilihan) {
+            case 1: hasil = cariRental(bacaInteger("Masukkan ID: ")); break;
+            case 2:
+                System.out.print("Masukkan nama penyewa: ");
+                hasil = cariRental(input.nextLine());
+                break;
+            default:
+                System.out.println("Pilihan tidak valid.");
+                return;
+        }
+        if (hasil != null) {
+            System.out.printf("Ditemukan: ID %d | %s | %s | %d jam | Total Rp%.0f%n",
+                    hasil.getIdRental(), hasil.getNamaPenyewa(), hasil.getJenisPS(),
+                    hasil.getDurasiJam(), hasil.hitungTotal());
+        } else {
+            System.out.println("Data rental tidak ditemukan.");
+        }
+    }
+
+    private static int bacaInteger(String pesan) {
+        while (true) {
+            System.out.print(pesan);
+            try {
+                return Integer.parseInt(input.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Input harus berupa angka bulat. Coba lagi.");
+            }
+        }
     }
 }
