@@ -1,12 +1,13 @@
-package com.mycompany.rentalps;1
+package com.mycompany.rentalps;
 import java.util.Scanner;
 
 public class RentalPS {
     private static final int KAPASITAS = 100;
     private static final Scanner input = new Scanner(System.in);
-    private static final RentalPSBase[] daftarRental = new RentalPSBase[KAPASITAS];
+    private static final RentalPSBase[] daftarRental = 
+            new RentalPSBase[KAPASITAS];
     private static int jumlahData = 0;
-    private static int idBerikutnya = 4;
+    private static int idBerikutnya = 5;
 
     public static void main(String[] args) {
         isiDataAwal();
@@ -15,16 +16,27 @@ public class RentalPS {
             tampilkanMenu();
             pilihan = bacaInteger("Pilih menu: ");
             switch (pilihan) {
-                case 1: tambahData(); break;
-                case 2: tampilkanSemuaData(); break;
-                case 3: menuPencarian(); break;
-                case 4:
-                    System.out.println("Total objek berhasil dibuat: " + RentalPSBase.getTotalObjek());
-                    System.out.println("Terima kasih telah menggunakan RentalPS.");
+                case 1:
+                    tambahData();
                     break;
-                default: System.out.println("Pilihan tidak tersedia. Masukkan angka 1-4.");
+                case 2:
+                    tampilkanSemuaData();
+                    break;
+                case 3:
+                    menuPencarian();
+                    break;
+                case 4:
+                    menuSimulasi();
+                    break;
+                case 5:
+                        System.out.println("Total objek berhasil dibuat: "
+                            + RentalPSBase.getTotalObjek());
+                        System.out.println("Terima kasih telah menggunakan RentalPS.");
+                        break;
+                    default:
+                        System.out.println("Pilihan tidak tersedia. Masukkan angka 1-5.");
             }
-        } while (pilihan != 4);
+        } while (pilihan != 5);
         input.close();
     }
 
@@ -32,6 +44,7 @@ public class RentalPS {
         daftarRental[jumlahData++] = new RentalPS3(1, "Andi", 2, 2);
         daftarRental[jumlahData++] = new RentalPS4(2, "Budi", 3, "FIFA");
         daftarRental[jumlahData++] = new RentalPS3(3, "Citra", 1, 1);
+        daftarRental[jumlahData++] = new RentalPS5(4, "Doni", 2, "Grafis 4K");
     }
 
     private static void tampilkanMenu() {
@@ -41,7 +54,8 @@ public class RentalPS {
         System.out.println("1. Tambah Data Rental");
         System.out.println("2. Tampilkan Seluruh Data");
         System.out.println("3. Pencarian Data");
-        System.out.println("4. Keluar");
+        System.out.println("4. Simulasi Rental");
+        System.out.println("5. Keluar");
         System.out.println("----------------------------------");
     }
 
@@ -53,9 +67,11 @@ public class RentalPS {
         System.out.println("\\n--- Tambah Data Rental ---");
         System.out.println("1. PS3 (Rp5.000/jam)");
         System.out.println("2. PS4 (Rp10.000/jam)");
-        int tipe = bacaInteger("Pilih tipe PS: ");
-        if (tipe != 1 && tipe != 2) {
-            System.out.println("Tipe PS tidak valid.");
+        System.out.println("3. PS5 (Rp15.000/jam)");
+        
+        int tipe = bacaInteger("Pilih tipe PS: "); 
+        if (tipe < 1 || tipe > 3) { 
+            System.out.println("Tipe PS tidak valid."); 
             return;
         }
 
@@ -75,7 +91,13 @@ public class RentalPS {
                     String game = input.nextLine().trim();
                     dataBaru = new RentalPS4(idBerikutnya, nama, durasi, game);
                     break;
-                default: return;
+                case 3:
+                    System.out.print("Fitur unggulan PS5: ");
+                    String fitur = input.nextLine().trim();
+                    dataBaru = new RentalPS5(idBerikutnya, nama, durasi, fitur);
+                    break;
+                default:
+                    return;
             }
             daftarRental[jumlahData++] = dataBaru;
             idBerikutnya++;
@@ -96,20 +118,36 @@ public class RentalPS {
             return;
         }
         for (int i = 0; i < jumlahData; i++) {
-            daftarRental[i].tampilkanDetail(); // dynamic binding / overriding
+            daftarRental[i].tampilkanDetail();
         }
         System.out.println("-----------------------------------------------------------");
         System.out.println("Jumlah data: " + jumlahData);
     }
+    private static void simulasiRental(RentalPSBase data) {
+        System.out.println("\n--- Simulasi Rental ---");
 
-    // Overloading: pencarian berdasarkan ID.
+        if (data == null) {
+            System.out.println("Data rental tidak ditemukan.");
+            return;
+        }
+
+        System.out.println("ID Rental   : " + data.getIdRental());
+        System.out.println("Nama        : " + data.getNamaPenyewa());
+        System.out.println("Jenis PS    : " + data.getJenisPS());
+        System.out.println("Durasi      : " + data.getDurasiJam() + " jam");
+
+        data.tampilkanDetail();
+
+        System.out.printf("Total biaya : Rp%.0f%n", data.hitungTotal());
+    }
+
+
     private static RentalPSBase cariRental(int id) {
         for (int i = 0; i < jumlahData; i++)
             if (daftarRental[i].getIdRental() == id) return daftarRental[i];
         return null;
     }
 
-    // Overloading: pencarian berdasarkan nama.
     private static RentalPSBase cariRental(String nama) {
         for (int i = 0; i < jumlahData; i++)
             if (daftarRental[i].getNamaPenyewa().equalsIgnoreCase(nama.trim())) return daftarRental[i];
@@ -139,6 +177,19 @@ public class RentalPS {
         } else {
             System.out.println("Data rental tidak ditemukan.");
         }
+    }
+    private static void menuSimulasi() {
+        System.out.println("\n--- Menu Simulasi Rental ---");
+        int id = bacaInteger("Masukkan ID rental yang ingin disimulasikan: ");
+
+        RentalPSBase data = cariRental(id);
+
+        if (data == null) {
+            System.out.println("Data rental tidak ditemukan.");
+            return;
+        }
+
+        simulasiRental(data);
     }
 
     private static int bacaInteger(String pesan) {
