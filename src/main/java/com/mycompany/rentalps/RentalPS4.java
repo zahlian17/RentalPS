@@ -1,5 +1,6 @@
 package com.mycompany.rentalps;
-public class RentalPS4 extends RentalPSBase {
+
+public class RentalPS4 extends RentalPSBase implements DapatDipinjam, DapatDinilai {
     private String gameFavorit;
 
     public RentalPS4(int idRental, String namaPenyewa, int durasiJam, String gameFavorit) {
@@ -8,6 +9,7 @@ public class RentalPS4 extends RentalPSBase {
     }
 
     public String getGameFavorit() { return gameFavorit; }
+
     public void setGameFavorit(String gameFavorit) {
         if (gameFavorit == null || gameFavorit.trim().isEmpty())
             throw new IllegalArgumentException("Game favorit tidak boleh kosong.");
@@ -16,6 +18,24 @@ public class RentalPS4 extends RentalPSBase {
 
     @Override
     public String getJenisPS() { return "PS4"; }
+
+    // [BARU MODUL 7] Implementasi abstract method superclass.
+    @Override
+    public void tampilkanFiturKhusus() {
+        System.out.println("Game favorit PS4: " + gameFavorit);
+    }
+
+    // [BARU MODUL 7] Implementasi interface DapatDipinjam.
+    @Override
+    public void prosesPinjamFisik() {
+        System.out.println("PS4 siap dipinjam secara langsung.");
+    }
+
+    // [BARU MODUL 7] Implementasi interface DapatDinilai.
+    @Override
+    public void beriRating() {
+        System.out.println("Rating PS4 berhasil diberikan.");
+    }
 
     @Override
     public void tampilkanDetail() {

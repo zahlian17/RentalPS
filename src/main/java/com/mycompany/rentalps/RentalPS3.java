@@ -1,5 +1,6 @@
 package com.mycompany.rentalps;
-public class RentalPS3 extends RentalPSBase {
+
+public class RentalPS3 extends RentalPSBase implements DapatDipinjam {
     private int jumlahStik;
 
     public RentalPS3(int idRental, String namaPenyewa, int durasiJam, int jumlahStik) {
@@ -8,6 +9,7 @@ public class RentalPS3 extends RentalPSBase {
     }
 
     public int getJumlahStik() { return jumlahStik; }
+
     public void setJumlahStik(int jumlahStik) {
         if (jumlahStik < 1 || jumlahStik > 4)
             throw new IllegalArgumentException("Jumlah stik harus 1 sampai 4.");
@@ -16,6 +18,18 @@ public class RentalPS3 extends RentalPSBase {
 
     @Override
     public String getJenisPS() { return "PS3"; }
+
+    // [BARU MODUL 7] Implementasi abstract method dari superclass.
+    @Override
+    public void tampilkanFiturKhusus() {
+        System.out.println("Fitur PS3: " + jumlahStik + " stik tersedia.");
+    }
+
+    // [BARU MODUL 7] Implementasi method interface.
+    @Override
+    public void prosesPinjamFisik() {
+        System.out.println("PS3 siap dipinjam secara langsung.");
+    }
 
     @Override
     public void tampilkanDetail() {
