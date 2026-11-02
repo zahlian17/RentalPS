@@ -1,51 +1,77 @@
 package com.mycompany.rentalps;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class RentalPS {
-    private static final int KAPASITAS = 100;
+
     private static final Scanner input = new Scanner(System.in);
-    // Array superclass menyimpan objek RentalPS3, RentalPS4, dan RentalPS5.
-    private static final RentalPSBase[] daftarRental = new RentalPSBase[KAPASITAS];
-    private static int jumlahData = 0;
-    // [MODUL 7] Empat data awal memakai ID 1-4, sehingga ID baru dimulai dari 5.
+    private static final ArrayList<RentalPSBase> daftarRental = new ArrayList<>();
+    private static final HashMap<String, String> dataAnggota = new HashMap<>();
     private static int idBerikutnya = 5;
 
     public static void main(String[] args) {
         isiDataAwal();
+        isiDataAnggotaAwal();
+
         int pilihan;
         do {
             tampilkanMenu();
             pilihan = bacaInteger("Pilih menu: ");
+
             switch (pilihan) {
-                case 1: tambahData(); break;
-                case 2: tampilkanSemuaData(); break;
-                case 3: menuPencarian(); break;
-                case 4: menuSimulasi(); break;
-                // [BARU MODUL 7] Menu untuk menguji abstract method dan interface.
+                case 1:
+                    tambahData();
+                    break;
+                case 2:
+                    tampilkanSemuaData();
+                    break;
+                case 3:
+                    menuPencarian();
+                    break;
+                case 4:
+                    menuSimulasi();
+                    break;
                 case 5: {
                     int id = bacaInteger("Masukkan ID rental: ");
                     RentalPSBase data = cariRental(id);
-                    if (data != null) prosesKemampuan(data);
-                    else System.out.println("Data rental tidak ditemukan.");
+
+                    if (data != null) {
+                        prosesKemampuan(data);
+                    } else {
+                        System.out.println("Data rental tidak ditemukan.");
+                    }
                     break;
                 }
                 case 6:
-                    System.out.println("Total objek berhasil dibuat: " + RentalPSBase.getTotalObjek());
+                    System.out.println("Total objek berhasil dibuat: "
+                            + RentalPSBase.getTotalObjek());
                     System.out.println("Terima kasih telah menggunakan RentalPS.");
                     break;
-                default: System.out.println("Pilihan tidak tersedia. Masukkan angka 1-6.");
+                case 7:
+                    menuAnggota();
+                    break;
+                default:
+                    System.out.println("Pilihan tidak tersedia. Masukkan angka 1-7.");
             }
         } while (pilihan != 6);
+
         input.close();
     }
 
     private static void isiDataAwal() {
-        daftarRental[jumlahData++] = new RentalPS3(1, "Andi", 2, 2);
-        daftarRental[jumlahData++] = new RentalPS4(2, "Budi", 3, "FIFA");
-        daftarRental[jumlahData++] = new RentalPS3(3, "Citra", 1, 1);
-        // [BARU MODUL 7] Data PS5 agar ketiga subclass terwakili.
-        daftarRental[jumlahData++] = new RentalPS5(4, "Doni", 2, "Grafis 4K");
+        daftarRental.add(new RentalPS3(1, "Andi", 2, 2));
+        daftarRental.add(new RentalPS4(2, "Budi", 3, "FIFA"));
+        daftarRental.add(new RentalPS3(3, "Citra", 1, 1));
+        daftarRental.add(new RentalPS5(4, "Doni", 2, "Grafis 4K"));
+    }
+
+    private static void isiDataAnggotaAwal() {
+        dataAnggota.put("A001", "Andi");
+        dataAnggota.put("A002", "Budi");
+        dataAnggota.put("A003", "Citra");
     }
 
     private static void tampilkanMenu() {
@@ -56,61 +82,91 @@ public class RentalPS {
         System.out.println("2. Tampilkan Seluruh Data");
         System.out.println("3. Pencarian Data");
         System.out.println("4. Simulasi Rental");
-        // [BARU MODUL 7] Menu interface dan abstract method.
         System.out.println("5. Proses Fitur dan Interface");
         System.out.println("6. Keluar");
+        System.out.println("7. Kelola Data Anggota");
         System.out.println("----------------------------------");
     }
 
     private static void tambahData() {
-        if (jumlahData >= daftarRental.length) {
-            System.out.println("Penyimpanan data penuh.");
-            return;
-        }
         System.out.println("\n--- Tambah Data Rental ---");
         System.out.println("1. PS3 (Rp5.000/jam)");
         System.out.println("2. PS4 (Rp10.000/jam)");
-        // [BARU MODUL 7] Opsi PS5 pada menu tambah data.
         System.out.println("3. PS5 (Rp15.000/jam)");
+
         int tipe = bacaInteger("Pilih tipe PS: ");
+
         if (tipe < 1 || tipe > 3) {
             System.out.println("Tipe PS tidak valid.");
             return;
         }
 
-        System.out.print("Nama penyewa: ");
-        String nama = input.nextLine().trim();
-        int durasi = bacaInteger("Durasi sewa (jam): ");
-
         try {
+            System.out.print("Nama penyewa: ");
+            String nama = input.nextLine().trim();
+
+            if (nama.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Nama penyewa tidak boleh kosong.");
+            }
+
+            int durasi = bacaInteger("Durasi sewa (jam): ");
+
+            if (durasi <= 0) {
+                throw new IllegalArgumentException(
+                        "Durasi sewa harus lebih dari 0 jam.");
+            }
+
             RentalPSBase dataBaru;
+
             switch (tipe) {
                 case 1: {
                     int stik = bacaInteger("Jumlah stik (1-4): ");
-                    dataBaru = new RentalPS3(idBerikutnya, nama, durasi, stik);
+                    dataBaru = new RentalPS3(
+                            idBerikutnya, nama, durasi, stik);
                     break;
                 }
                 case 2: {
                     System.out.print("Game favorit: ");
                     String game = input.nextLine().trim();
-                    dataBaru = new RentalPS4(idBerikutnya, nama, durasi, game);
+
+                    if (game.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "Game favorit tidak boleh kosong.");
+                    }
+
+                    dataBaru = new RentalPS4(
+                            idBerikutnya, nama, durasi, game);
                     break;
                 }
-                // [BARU MODUL 7] Membuat objek PS5 dari menu.
                 case 3: {
                     System.out.print("Fitur unggulan PS5: ");
                     String fitur = input.nextLine().trim();
-                    dataBaru = new RentalPS5(idBerikutnya, nama, durasi, fitur);
+
+                    if (fitur.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "Fitur PS5 tidak boleh kosong.");
+                    }
+
+                    dataBaru = new RentalPS5(
+                            idBerikutnya, nama, durasi, fitur);
                     break;
                 }
-                default: return;
+                default:
+                    return;
             }
-            daftarRental[jumlahData++] = dataBaru;
+
+            daftarRental.add(dataBaru);
             idBerikutnya++;
+
             System.out.println("Data berhasil ditambahkan.");
-            System.out.printf("Total biaya: Rp%.0f%n", dataBaru.hitungTotal());
+            System.out.printf("Total biaya: Rp%.0f%n",
+                    dataBaru.hitungTotal());
+
         } catch (IllegalArgumentException e) {
             System.out.println("Gagal menambahkan data: " + e.getMessage());
+        } finally {
+            System.out.println("Proses tambah data selesai.");
         }
     }
 
@@ -119,29 +175,48 @@ public class RentalPS {
         System.out.printf("| %-4s | %-18s | %-8s | %-5s | %-11s | %-11s |%n",
                 "ID", "Penyewa/Info", "Jenis", "Jam", "Harga/Jam", "Total");
         System.out.println("-----------------------------------------------------------");
-        if (jumlahData == 0) {
+
+        if (daftarRental.isEmpty()) {
             System.out.println("Belum ada data rental.");
             return;
         }
-        for (int i = 0; i < jumlahData; i++) {
-            // Dynamic binding: Java menjalankan override sesuai jenis objek sebenarnya.
-            daftarRental[i].tampilkanDetail();
+
+        for (int i = 0; i < daftarRental.size(); i++) {
+            daftarRental.get(i).tampilkanDetail();
         }
+
         System.out.println("-----------------------------------------------------------");
-        System.out.println("Jumlah data: " + jumlahData);
+        System.out.println("Jumlah data: " + daftarRental.size());
     }
 
-    // Method overloading pertama: mencari berdasarkan ID.
+    private static RentalPSBase cariRentalWajib(int id)
+            throws RentalTidakDitemukanException {
+
+        for (RentalPSBase data : daftarRental) {
+            if (data.getIdRental() == id) {
+                return data;
+            }
+        }
+
+        throw new RentalTidakDitemukanException(
+                "Data rental dengan ID " + id + " tidak ditemukan.");
+    }
+
     private static RentalPSBase cariRental(int id) {
-        for (int i = 0; i < jumlahData; i++)
-            if (daftarRental[i].getIdRental() == id) return daftarRental[i];
-        return null;
+        try {
+            return cariRentalWajib(id);
+        } catch (RentalTidakDitemukanException e) {
+            return null;
+        }
     }
 
-    // Method overloading kedua: mencari berdasarkan nama.
     private static RentalPSBase cariRental(String nama) {
-        for (int i = 0; i < jumlahData; i++)
-            if (daftarRental[i].getNamaPenyewa().equalsIgnoreCase(nama.trim())) return daftarRental[i];
+        for (RentalPSBase data : daftarRental) {
+            if (data.getNamaPenyewa().equalsIgnoreCase(nama.trim())) {
+                return data;
+            }
+        }
+
         return null;
     }
 
@@ -149,10 +224,22 @@ public class RentalPS {
         System.out.println("\n--- Pencarian Data ---");
         System.out.println("1. Cari berdasarkan ID");
         System.out.println("2. Cari berdasarkan nama");
+
         int pilihan = bacaInteger("Pilih cara pencarian: ");
         RentalPSBase hasil;
+
         switch (pilihan) {
-            case 1: hasil = cariRental(bacaInteger("Masukkan ID: ")); break;
+            case 1: {
+                int id = bacaInteger("Masukkan ID: ");
+
+                try {
+                    hasil = cariRentalWajib(id);
+                } catch (RentalTidakDitemukanException e) {
+                    System.out.println("Pencarian gagal: " + e.getMessage());
+                    return;
+                }
+                break;
+            }
             case 2:
                 System.out.print("Masukkan nama penyewa: ");
                 hasil = cariRental(input.nextLine());
@@ -161,10 +248,15 @@ public class RentalPS {
                 System.out.println("Pilihan tidak valid.");
                 return;
         }
+
         if (hasil != null) {
-            System.out.printf("Ditemukan: ID %d | %s | %s | %d jam | Total Rp%.0f%n",
-                    hasil.getIdRental(), hasil.getNamaPenyewa(), hasil.getJenisPS(),
-                    hasil.getDurasiJam(), hasil.hitungTotal());
+            System.out.printf(
+                    "Ditemukan: ID %d | %s | %s | %d jam | Total Rp%.0f%n",
+                    hasil.getIdRental(),
+                    hasil.getNamaPenyewa(),
+                    hasil.getJenisPS(),
+                    hasil.getDurasiJam(),
+                    hasil.hitungTotal());
         } else {
             System.out.println("Data rental tidak ditemukan.");
         }
@@ -172,55 +264,156 @@ public class RentalPS {
 
     private static void menuSimulasi() {
         System.out.println("\n--- Menu Simulasi Rental ---");
-        int id = bacaInteger("Masukkan ID rental yang ingin disimulasikan: ");
+        int id = bacaInteger(
+                "Masukkan ID rental yang ingin disimulasikan: ");
+
         RentalPSBase data = cariRental(id);
+
         if (data == null) {
             System.out.println("Data rental tidak ditemukan.");
             return;
         }
+
         simulasiRental(data);
     }
 
-    // Method menerima parameter superclass sehingga bisa memproses semua subclass.
     private static void simulasiRental(RentalPSBase data) {
         System.out.println("\n--- Simulasi Rental ---");
         System.out.println("ID Rental   : " + data.getIdRental());
         System.out.println("Nama        : " + data.getNamaPenyewa());
         System.out.println("Jenis PS    : " + data.getJenisPS());
         System.out.println("Durasi      : " + data.getDurasiJam() + " jam");
+
+        // Dynamic binding
         data.tampilkanDetail();
+
         System.out.printf("Total biaya : Rp%.0f%n", data.hitungTotal());
     }
 
-    // [BARU MODUL 7] Method parameter superclass, memakai abstract method dan instanceof.
     private static void prosesKemampuan(RentalPSBase data) {
         System.out.println("\n--- Proses Abstract Method dan Interface ---");
         data.tampilkanFiturKhusus();
 
-        // [BARU MODUL 7] Cek dukungan interface sebelum pemanggilan method.
         if (data instanceof DapatDipinjam) {
             DapatDipinjam pinjam = (DapatDipinjam) data;
             pinjam.prosesPinjamFisik();
         } else {
-            System.out.println("Objek ini tidak mengimplementasikan DapatDipinjam.");
+            System.out.println(
+                    "Objek ini tidak mengimplementasikan DapatDipinjam.");
         }
 
-        // [BARU MODUL 7] Cek dukungan interface rating.
         if (data instanceof DapatDinilai) {
             DapatDinilai nilai = (DapatDinilai) data;
             nilai.beriRating();
         } else {
-            System.out.println("Objek ini tidak mengimplementasikan DapatDinilai.");
+            System.out.println(
+                    "Objek ini tidak mengimplementasikan DapatDinilai.");
+        }
+    }
+
+    private static void menuAnggota() {
+        int pilihan;
+
+        do {
+            System.out.println("\n--- Menu Data Anggota ---");
+            System.out.println("1. Tambah Anggota");
+            System.out.println("2. Tampilkan Semua Anggota");
+            System.out.println("3. Cari Anggota");
+            System.out.println("4. Kembali");
+
+            pilihan = bacaInteger("Pilih menu anggota: ");
+
+            switch (pilihan) {
+                case 1:
+                    tambahAnggota();
+                    break;
+
+                case 2:
+                    if (dataAnggota.isEmpty()) {
+                        System.out.println("Belum ada data anggota.");
+                    } else {
+                        System.out.println("\n--- Daftar Anggota ---");
+
+                        for (String id : dataAnggota.keySet()) {
+                            System.out.println(
+                                    id + " - " + dataAnggota.get(id));
+                        }
+                    }
+                    break;
+
+                case 3:
+                    System.out.print("Masukkan ID anggota: ");
+                    String id = input.nextLine().trim();
+
+                    if (dataAnggota.containsKey(id)) {
+                        System.out.println(
+                                "Nama anggota: " + dataAnggota.get(id));
+                    } else {
+                        System.out.println("Anggota tidak ditemukan.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.println("Kembali ke menu utama.");
+                    break;
+
+                default:
+                    System.out.println("Pilihan tidak valid.");
+            }
+        } while (pilihan != 4);
+    }
+
+    private static void tambahAnggota() {
+        try {
+            System.out.print("ID anggota: ");
+            String id = input.nextLine().trim();
+
+            if (id.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "ID anggota tidak boleh kosong.");
+            }
+
+            if (dataAnggota.containsKey(id)) {
+                throw new IllegalArgumentException(
+                        "ID anggota sudah terdaftar.");
+            }
+
+            System.out.print("Nama anggota: ");
+            String nama = input.nextLine().trim();
+
+            if (nama.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Nama anggota tidak boleh kosong.");
+            }
+
+            dataAnggota.put(id, nama);
+            System.out.println("Anggota berhasil ditambahkan.");
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Gagal menambahkan anggota: " + e.getMessage());
+        } finally {
+            System.out.println("Proses anggota selesai.");
         }
     }
 
     private static int bacaInteger(String pesan) {
         while (true) {
             System.out.print(pesan);
+
             try {
-                return Integer.parseInt(input.nextLine().trim());
-            } catch (NumberFormatException e) {
-                System.out.println("Input harus berupa angka bulat. Coba lagi.");
+                String teks = input.nextLine().trim();
+
+                if (teks.isEmpty()) {
+                    throw new InputMismatchException(
+                            "Input tidak boleh kosong.");
+                }
+
+                return Integer.parseInt(teks);
+
+            } catch (NumberFormatException | InputMismatchException e) {
+                System.out.println(
+                        "Input harus berupa angka bulat. Coba lagi.");
+            } finally {
             }
         }
     }
