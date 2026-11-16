@@ -1,6 +1,9 @@
 package com.mycompany.rentalps;
 
-public abstract class RentalPSBase {
+import java.io.Serializable;
+
+public abstract class RentalPSBase implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int idRental;
     private String namaPenyewa;
     private int durasiJam;
@@ -48,7 +51,6 @@ public abstract class RentalPSBase {
     public double hitungTotal() { return durasiJam * hargaPerJam; }
     public String getJenisPS() { return "PlayStation"; }
 
-    // [BARU MODUL 7] Abstract method wajib diimplementasikan setiap subclass.
     public abstract void tampilkanFiturKhusus();
 
     public void tampilkanDetail() {

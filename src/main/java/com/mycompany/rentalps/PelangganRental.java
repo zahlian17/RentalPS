@@ -1,6 +1,9 @@
 package com.mycompany.rentalps;
 
-public class PelangganRental {
+import java.io.Serializable;
+
+public class PelangganRental implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String idPelanggan;
     private final String namaPelanggan;
 

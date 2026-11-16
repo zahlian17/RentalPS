@@ -8,12 +8,18 @@ import java.util.Scanner;
 public class RentalPS {
 
     private static final Scanner input = new Scanner(System.in);
-    private static final SistemRentalPS sistem = new SistemRentalPS();
+    private static SistemRentalPS sistem = new SistemRentalPS();
     private static int idBerikutnya = 5;
 
     public static void main(String[] args) {
-        isiDataAwal();
-        isiDataAnggotaAwal();
+        SistemRentalPS dataTersimpan = SistemRentalPS.muatDataDariFile();
+        if (dataTersimpan != null) {
+            sistem = dataTersimpan;
+            idBerikutnya = cariIdBerikutnya();
+        } else {
+            isiDataAwal();
+            isiDataAnggotaAwal();
+        }
 
         int pilihan;
         do {
@@ -58,12 +64,36 @@ public class RentalPS {
                 case 9:
                     menuTransaksi();
                     break;
+                case 10:
+                    sistem.bacaLogTransaksi();
+                    break;
+                case 11:
+                    sistem.simpanDataKeFile();
+                    break;
+                case 12:
+                    SistemRentalPS hasilMuat = SistemRentalPS.muatDataDariFile();
+                    if (hasilMuat != null) {
+                        sistem = hasilMuat;
+                        idBerikutnya = cariIdBerikutnya();
+                        System.out.println("Data aktif berhasil diperbarui dari file.");
+                    }
+                    break;
                 default:
-                    System.out.println("Pilihan tidak tersedia. Masukkan angka 1-9.");
+                    System.out.println("Pilihan tidak tersedia. Masukkan angka 1-12.");
             }
         } while (pilihan != 6);
 
+        // Simpan otomatis sebelum program ditutup.
+        sistem.simpanDataKeFile();
         input.close();
+    }
+
+    private static int cariIdBerikutnya() {
+        int terbesar = 0;
+        for (RentalPSBase data : sistem.getDaftarRental()) {
+            if (data.getIdRental() > terbesar) terbesar = data.getIdRental();
+        }
+        return terbesar + 1;
     }
 
     private static void isiDataAwal() {
@@ -92,6 +122,9 @@ public class RentalPS {
         System.out.println("7. Kelola Data Anggota");
         System.out.println("8. Tampilkan Fasilitas (Composition)");
         System.out.println("9. Simulasi Transaksi (Association)");
+        System.out.println("10. Baca Log Transaksi (.txt)");
+        System.out.println("11. Simpan Data (Serialization)");
+        System.out.println("12. Muat Data (Deserialization)");
         System.out.println("----------------------------------");
     }
 

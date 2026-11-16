@@ -1,6 +1,9 @@
 package com.mycompany.rentalps;
 
-public class FasilitasRental {
+import java.io.Serializable;
+
+public class FasilitasRental implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String namaFasilitas;
     private final int jumlahUnit;
 
